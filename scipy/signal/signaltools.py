@@ -1447,11 +1447,12 @@ def detrend(data, axis=-1, type='linear', bp=0):
     axis : int, optional
         The axis along which to detrend the data. By default this is the
         last axis (-1).
-    type : {'linear', 'constant'}, optional
+    type : {'linear', 'constant', False}, optional
         The type of detrending. If ``type == 'linear'`` (default),
         the result of a linear least-squares fit to `data` is subtracted
         from `data`.
         If ``type == 'constant'``, only the mean of `data` is subtracted.
+        If `type` is False, no detrending is done and `data` is returned.
     bp : array_like of ints, optional
         A sequence of break points. If given, an individual linear fit is
         performed for each part of `data` between two break points.
@@ -1473,13 +1474,15 @@ def detrend(data, axis=-1, type='linear', bp=0):
     True
 
     """
-    if type not in ['linear', 'l', 'constant', 'c']:
-        raise ValueError("Trend type must be 'linear' or 'constant'.")
+    if type not in ['linear', 'l', 'constant', 'c', False]:
+        raise ValueError("Trend type must be 'linear', 'constant' or False.")
     data = asarray(data)
     dtype = data.dtype.char
     if dtype not in 'dfDF':
         dtype = 'd'
-    if type in ['constant', 'c']:
+    if type is False:
+        return data
+    elif type in ['constant', 'c']:
         ret = data - expand_dims(mean(data, axis), axis)
         return ret
     else:
